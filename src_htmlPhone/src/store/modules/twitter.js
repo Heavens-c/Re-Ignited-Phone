@@ -1,9 +1,22 @@
 import PhoneAPI from './../../PhoneAPI'
 import Vue from 'vue'
+import crypto from 'crypto'
+
+const encryptionKey = 'your-encryption-key'; // Replace with a secure key
+
+function encrypt(text) {
+  const cipher = crypto.createCipher('aes-256-ctr', encryptionKey);
+  return cipher.update(text, 'utf8', 'hex') + cipher.final('hex');
+}
+
+function decrypt(text) {
+  const decipher = crypto.createDecipher('aes-256-ctr', encryptionKey);
+  return decipher.update(text, 'hex', 'utf8') + decipher.final('utf8');
+}
 
 const state = {
   twitterUsername: localStorage['gcphone_twitter_username'],
-  twitterPassword: localStorage['gcphone_twitter_password'],
+  twitterPassword: localStorage['gcphone_twitter_password'] ? decrypt(localStorage['gcphone_twitter_password']) : undefined,
   twitterAvatarUrl: localStorage['gcphone_twitter_avatarUrl'],
   twitterNotification: localStorage['gcphone_twitter_notif'] ? parseInt(localStorage['gcphone_twitter_notif']) : 1,
   twitterNotificationSound: localStorage['gcphone_twitter_notif_sound'] !== 'false',
@@ -56,7 +69,7 @@ const actions = {
   },
   setAccount ({ commit }, data) {
     localStorage['gcphone_twitter_username'] = data.username
-    localStorage['gcphone_twitter_password'] = data.password
+    localStorage['gcphone_twitter_password'] = encrypt(data.password)
     localStorage['gcphone_twitter_avatarUrl'] = data.avatarUrl
     commit('UPDATE_ACCOUNT', data)
   },
