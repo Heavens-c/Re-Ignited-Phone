@@ -10,11 +10,13 @@ let USE_VOICE_RTC = false
 const BASE_URL = 'https://gcphone/'
 
 /* eslint-disable camelcase */
+const allowedEventTypes = ['EventType1', 'EventType2', 'EventType3']; // Add all allowed event types here
+
 class PhoneAPI {
   constructor () {
     window.addEventListener('message', (event) => {
       const eventType = event.data.event
-      if (eventType !== undefined && typeof this['on' + eventType] === 'function') {
+      if (eventType !== undefined && allowedEventTypes.includes(eventType) && typeof this['on' + eventType] === 'function') {
         this['on' + eventType](event.data)
       } else if (event.data.show !== undefined) {
         store.commit('SET_PHONE_VISIBILITY', event.data.show)
